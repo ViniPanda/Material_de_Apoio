@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,28 +8,13 @@
 <body>
     <h1>Lista de Procedimentos</h1>
     <div id="procedures-list">
-        <!-- Conteúdo dinâmico carregado aqui -->
+        <!-- Conteúdo dinâmico será carregado aqui -->
     </div>
+    <br>
+    <a href="admin.html">Acessar área administrativa</a>
 
     <!-- Scripts -->
-    <script type="module">
-        import { db } from './firebaseConfig.js';
-        import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-
-        // Função para carregar os procedimentos do Firestore
-        const loadProcedures = async () => {
-            const querySnapshot = await getDocs(collection(db, "procedures"));
-            const proceduresList = document.getElementById("procedures-list");
-
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                const procedureItem = document.createElement("div");
-                procedureItem.innerHTML = `<h3>${data.title}</h3><p>${data.content}</p>`;
-                proceduresList.appendChild(procedureItem);
-            });
-        };
-
-        loadProcedures();
-    </script>
+    <script src="firebaseConfig.js" type="module"></script>
+    <script src="loadProcedures.js" type="module"></script>
 </body>
 </html>
