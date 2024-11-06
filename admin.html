@@ -25,28 +25,38 @@
 
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
+            console.log("Formulário enviado.");
 
             const title = document.getElementById('title').value;
             const content = document.getElementById('content').value;
             const imageFile = document.getElementById('imageFile').files[0];
             let imageUrl = '';
 
-            if (imageFile) {
-                // Upload da imagem para o Firebase Storage
-                const imageRef = ref(storage, 'images/' + imageFile.name);
-                await uploadBytes(imageRef, imageFile);
-                imageUrl = await getDownloadURL(imageRef);
+            try {
+                if (imageFile) {
+                    // Upload da imagem para o Firebase Storage
+                    console.log("Iniciando upload da imagem...");
+                    const imageRef = ref(storage, 'images/' + imageFile.name);
+                    await uploadBytes(imageRef, imageFile);
+                    imageUrl = await getDownloadURL(imageRef);
+                    console.log("Upload concluído. URL da imagem:", imageUrl);
+                }
+
+                // Adicionar o procedimento ao Firestore
+                console.log("Adicionando procedimento ao Firestore...");
+                await addDoc(collection(db, "procedures"), {
+                    title: title,
+                    content: content,
+                    imageUrl: imageUrl
+                });
+                console.log("Procedimento adicionado com sucesso!");
+
+                form.reset();
+                alert('Procedimento adicionado com sucesso!');
+            } catch (error) {
+                console.error("Erro ao adicionar procedimento:", error);
+                alert("Erro ao adicionar procedimento. Verifique o console para mais detalhes.");
             }
-
-            // Adicionar o procedimento ao Firestore
-            await addDoc(collection(db, "procedures"), {
-                title: title,
-                content: content,
-                imageUrl: imageUrl
-            });
-
-            form.reset();
-            alert('Procedimento adicionado com sucesso!');
         });
     </script>
 </body>
