@@ -1,30 +1,53 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Administração - Material de Apoio</title>
-    <link rel="stylesheet" href="assets/css/styles.css">
+    <title>Admin - Procedimentos</title>
 </head>
 <body>
-    <h1>Área Administrativa</h1>
-    <p>Para adicionar novos PDFs, siga os passos abaixo:</p>
-    <ol>
-        <li>Faça upload do arquivo PDF na pasta <code>assets/pdfs</code>.</li>
-        <li>Abra o arquivo <code>index.html</code> no editor.</li>
-        <li>Adicione uma nova linha na lista, no formato:
-            <pre>&lt;li&gt;&lt;a href="assets/pdfs/novo-arquivo.pdf" target="_blank"&gt;Nome do PDF&lt;/a&gt;&lt;/li&gt;</pre>
-        </li>
-        <li>Salve as alterações e envie para o GitHub:
-            <pre>
-git add .
-git commit -m "Adiciona novo PDF"
-git push
-            </pre>
-        </li>
-    </ol>
-    <footer>
-        <a href="index.html">Voltar para a Página Principal</a>
-    </footer>
+    <h1>Administração de Procedimentos</h1>
+
+    <form id="add-procedure-form">
+        <input type="text" id="title" placeholder="Título" required>
+        <textarea id="content" placeholder="Conteúdo" required></textarea>
+        <input type="file" id="imageFile">
+        <button type="submit">Adicionar Procedimento</button>
+    </form>
+
+    <!-- Scripts -->
+    <script type="module">
+        import { db, storage } from './firebaseConfig.js';
+        import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+        import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js";
+
+        const form = document.getElementById('add-procedure-form');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            const imageFile = document.getElementById('imageFile').files[0];
+            let imageUrl = '';
+
+            if (imageFile) {
+                // Upload da imagem para o Firebase Storage
+                const imageRef = ref(storage, 'images/' + imageFile.name);
+                await uploadBytes(imageRef, imageFile);
+                imageUrl = await getDownloadURL(imageRef);
+            }
+
+            // Adicionar o procedimento ao Firestore
+            await addDoc(collection(db, "procedures"), {
+                title: title,
+                content: content,
+                imageUrl: imageUrl
+            });
+
+            form.reset();
+            alert('Procedimento adicionado com sucesso!');
+        });
+    </script>
 </body>
 </html>

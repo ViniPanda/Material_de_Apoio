@@ -1,19 +1,35 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Material de Apoio</title>
-    <link rel="stylesheet" href="assets/css/styles.css">
+    <title>Procedimentos</title>
 </head>
 <body>
-    <h1>Material de Apoio</h1>
-    <ul id="pdf-list">
-        <li><a href="assets/pdfs/exemplo.pdf" target="_blank">Exemplo de PDF 1</a></li>
-        <!-- Adicione mais PDFs manualmente aqui -->
-    </ul>
-    <footer>
-        <a href="admin.html">Área Administrativa</a>
-    </footer>
+    <h1>Lista de Procedimentos</h1>
+    <div id="procedures-list">
+        <!-- Conteúdo dinâmico carregado aqui -->
+    </div>
+
+    <!-- Scripts -->
+    <script type="module">
+        import { db } from './firebaseConfig.js';
+        import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+
+        // Função para carregar os procedimentos do Firestore
+        const loadProcedures = async () => {
+            const querySnapshot = await getDocs(collection(db, "procedures"));
+            const proceduresList = document.getElementById("procedures-list");
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const procedureItem = document.createElement("div");
+                procedureItem.innerHTML = `<h3>${data.title}</h3><p>${data.content}</p>`;
+                proceduresList.appendChild(procedureItem);
+            });
+        };
+
+        loadProcedures();
+    </script>
 </body>
 </html>
